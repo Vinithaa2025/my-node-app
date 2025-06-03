@@ -3,14 +3,24 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "express": "^5.1.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
     "jest": "^29.7.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vinithaa2025/my-node-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vinithaa2025/my-node-app/issues"
+  },
+  "homepage": "https://github.com/Vinithaa2025/my-node-app#readme",
+  "description": ""
 }
