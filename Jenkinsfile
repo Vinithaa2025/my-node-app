@@ -38,21 +38,15 @@ pipeline {
         }
 
         stage('Release') {
-            steps {
-                echo 'Releasing the application...'
-                // Generate release tag using timestamp
-                bat '''
-                FOR /F "tokens=1-4 delims=/ " %%a in ('date /t') do (
-                    SET mydate=%%d-%%b-%%c
-                )
-                FOR /F "tokens=1 delims= " %%a in ('time /t') do (
-                    SET mytime=%%a
-                )
-                git tag "release-%mydate%_%mytime%"
-                git push origin --tags
-                '''
-            }
+    steps {
+        echo 'Generating local release metadata...'
+        script {
+            def timestamp = new Date().format("yyyy-MM-dd_HH-mm-ss")
+            writeFile file: "release-${timestamp}.txt", text: "Release generated at ${timestamp}\nVersion: 1.0.0\nStatus: Ready for production"
         }
+        echo 'Release file created successfully.'
+        }
+      }
     }
 }
 
