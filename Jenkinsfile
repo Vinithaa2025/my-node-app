@@ -47,6 +47,25 @@ pipeline {
         echo 'Release file created successfully.'
         }
       }
+        stage('Monitoring and Alerting') {
+    steps {
+        echo 'Simulating monitoring check...'
+        script {
+            // Simulated metric check
+            def cpuUsage = new Random().nextInt(100)
+            echo "CPU usage: ${cpuUsage}%"
+
+            if (cpuUsage > 85) {
+                echo '⚠️ High CPU usage detected! Sending alert...'
+                writeFile file: 'alert.log', text: "High CPU usage detected during build: ${cpuUsage}%"
+                // Optionally: fail the build if usage is too high
+                // error("CPU usage too high: ${cpuUsage}%")
+            } else {
+                echo '✅ CPU usage within normal range.'
+            }
+         }
+       }
+      }
     }
 }
 
