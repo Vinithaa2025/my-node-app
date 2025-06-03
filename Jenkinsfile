@@ -33,13 +33,28 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying application...'
-                // Simulate deployment
                 bat 'echo "Deploy successful! (simulation)"'
-                // Example of real deployment step:
-                // bat 'scp -r * user@yourserver:/var/www/yourapp'
+            }
+        }
+
+        stage('Release') {
+            steps {
+                echo 'Releasing the application...'
+                // Generate release tag using timestamp
+                bat '''
+                FOR /F "tokens=1-4 delims=/ " %%a in ('date /t') do (
+                    SET mydate=%%d-%%b-%%c
+                )
+                FOR /F "tokens=1 delims= " %%a in ('time /t') do (
+                    SET mytime=%%a
+                )
+                git tag "release-%mydate%_%mytime%"
+                git push origin --tags
+                '''
             }
         }
     }
 }
+
 
 
