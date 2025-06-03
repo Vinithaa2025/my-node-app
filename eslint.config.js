@@ -1,13 +1,13 @@
+// eslint.config.js
 export default [
   {
     files: ['**/*.js'],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
+      sourceType: 'module', // 👈 This line tells ESLint to parse ES modules correctly
     },
     rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off'
+      semi: 'error',
+      quotes: ['error', 'single'],
     },
   },
 ];
