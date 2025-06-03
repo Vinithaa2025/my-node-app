@@ -26,9 +26,20 @@ pipeline {
         stage('Security') {
             steps {
                 echo 'Running npm audit for security checks...'
-                bat 'npm audit --audit-level=low'  // You can set to moderate/high/critical as needed
+                bat 'npm audit --audit-level=low'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                // Simulate deployment
+                bat 'echo "Deploy successful! (simulation)"'
+                // Example of real deployment step:
+                // bat 'scp -r * user@yourserver:/var/www/yourapp'
             }
         }
     }
 }
+
 
