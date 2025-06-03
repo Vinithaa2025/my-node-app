@@ -1,92 +1,60 @@
 pipeline {
-  agent any 
-  tools { nodejs "node12" } 
-  environment {
-    IMAGE_TAG = "${env.BUILD_NUMBER}"
-    APP_IMAGE = "yourdockerhubuser/my-node-app"
+  agent any
+
+  tools {
+    nodejs "node12"  // Make sure this tool is set in Global Tool Configuration
   }
+
   stages {
-    stage('Build') {
+    stage('Install Dependencies') {
       steps {
-        echo 'Installing and building Node app...'
-        sh 'npm install'
-        // If you have a build step (e.g. webpack), include it here
-        // sh 'npm run build'
+        echo 'Installing npm dependencies...'
+        bat 'npm install'
       }
     }
-    stage('Test') {
+
+    stage('Run Tests') {
       steps {
-        echo 'Running tests with Jest...'
-        sh 'npm test'
+        echo 'Running tests...'
+        bat 'npm test'
       }
     }
-    stage('Code Quality') {
+
+    stage('Build Project') {
       steps {
-        echo 'Running SonarQube analysis...'
-        withSonarQubeEnv('sonar') {
-          sh 'sonar-scanner -Dsonar.projectKey=my-node-app -Dsonar.sources=.'
-        }
+        echo 'Building the project...'
+        // Add this only if your package.json has a build script
+        // bat 'npm run build'
       }
     }
-    stage('Docker Build') {
-      steps {
-        echo 'Building Docker image...'
-        sh "docker build -t ${APP_IMAGE}:${IMAGE_TAG} ."
-      }
-    }
-    stage('Security Scan') {
-      steps {
-        echo 'Scanning Docker image with Trivy...'
-        // Pull Trivy image and run scan (mount Docker socket for host images)
-        sh """
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v $HOME/.trivy-cache:/root/.cache/ \
-            aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL \
-            ${APP_IMAGE}:${IMAGE_TAG} > trivy-report.txt
-        """
-      }
-    }
-    stage('Push to Docker Hub') {
-      steps {
-        echo 'Pushing image to Docker Hub...'
-        withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_PASS'),
-                         usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_TOKEN')]) {
-          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-          sh "docker push ${APP_IMAGE}:${IMAGE_TAG}"
-        }
-      }
-    }
-    stage('Deploy') {
-      steps {
-        echo 'Deploying application (via Docker Compose on target host)...'
-        sshagent(credentials: ['ssh-deploy-key']) {
-          sh """
-            ssh -o StrictHostKeyChecking=no user@your.server.ip '
-              cd /path/to/deployment && \
-              docker-compose pull && \
-              docker-compose up -d
-            '
-          """
-        }
-      }
-    }
-    stage('Monitor') {
-      steps {
-        echo 'Tagging pipeline run for Datadog...'
-        // Add a Datadog tag (requires Datadog Jenkins plugin)
-        datadog {
-          // optional: set tags or environment
-          tags('project:my-node-app', 'environment:dev')
-        }
-      }
-    }
+
+    // Optional placeholder for future stages
+    // You can uncomment and use these later when Docker, Sonar, or Trivy are ready
+
+    // stage('Code Quality') {
+    //   steps {
+    //     echo 'Run SonarQube scan here...'
+    //   }
+    // }
+
+    // stage('Security Scan') {
+    //   steps {
+    //     echo 'Run Trivy scan here...'
+    //   }
+    // }
+
+    // stage('Deploy') {
+    //   steps {
+    //     echo 'Deploy step goes here...'
+    //   }
+    // }
   }
+
   post {
     always {
-      // Archive Trivy report for review
-      archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+      echo 'Pipeline execution completed.'
     }
   }
 }
+
 
